@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalkulator AGD &amp; Klinis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f5f7;--panel:#fff;--ink:#14202b;--mute:#5b6b79;--line:#d9e0e6;--acc:#0e6b73;--acc-ink:#fff;--soft:#e8f1f2;--bad:#b3261e;--badbg:#fbe9e7;--warn:#8a5a00;--warnbg:#fff2d6;--ok:#17653a;--okbg:#e2f3e8;--field:#f8fafb;
+color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1419;--panel:#151e26;--ink:#e6edf2;--mute:#97a6b3;--line:#27333d;--acc:#4fc3cc;--acc-ink:#06232626;--soft:#14272b;--bad:#ff9d94;--badbg:#3a1a18;--warn:#f2c35d;--warnbg:#3a2d0f;--ok:#7fd9a1;--okbg:#12301f;--field:#101820;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1419;--panel:#151e26;--ink:#e6edf2;--mute:#97a6b3;--line:#27333d;--acc:#4fc3cc;--acc-ink:#062326;--soft:#14272b;--bad:#ff9d94;--badbg:#3a1a18;--warn:#f2c35d;--warnbg:#3a2d0f;--ok:#7fd9a1;--okbg:#12301f;--field:#101820;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--acc-ink:#062326}}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "IBM Plex Sans",system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--panel);z-index:10}
+h1,h2,h3{font-family:"Source Serif 4",Georgia,serif;font-weight:600;margin:0}
+header{background:var(--panel);border-bottom:1px solid var(--line)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0}
+.top h1{font-size:26px;line-height:1.15}
+.top p{margin:4px 0 0;color:var(--mute);font-size:13.5px}
+.credit{font-size:13px;color:var(--mute)}
+.credit b{color:var(--ink);font-weight:600}
+button{font:inherit;cursor:pointer}
+.icon{border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap}
+main{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:20px;padding:20px 0 32px;align-items:start}
+@media (max-width:860px){main{grid-template-columns:1fr}.top{align-items:flex-start}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+.card h2{font-size:19px;margin-bottom:4px}
+.sub{color:var(--mute);font-size:13px;margin:0 0 14px}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.chip{border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:999px;padding:5px 11px;font-size:12.5px}
+.chip:hover,.chip:focus-visible{border-color:var(--acc);color:var(--acc)}
+fieldset{border:0;padding:0;margin:0 0 14px}
+legend{font-family:"Source Serif 4",Georgia,serif;font-weight:600;font-size:15px;padding:0;margin-bottom:8px;color:var(--acc)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-size:12.5px;color:var(--mute)}
+input{width:100%;margin-top:3px;padding:9px 10px;border:1px solid var(--line);border-radius:7px;background:var(--field);color:var(--ink);font:inherit;font-size:15px}
+input:focus,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.sg{display:flex;gap:6px;align-items:flex-end}.sg input{flex:1;min-width:0}.sg .icon{margin-top:3px;padding:9px 12px;font-size:15px}
+.actions{display:flex;gap:8px;margin-top:6px}
+.primary{flex:1;background:var(--acc);color:var(--acc-ink);border:0;border-radius:8px;padding:11px;font-weight:600}
+.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:11px 16px}
+.res-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.badge{display:inline-block;padding:3px 11px;border-radius:999px;font-size:12.5px;font-weight:600;background:var(--soft);color:var(--mute);margin-bottom:6px}
+.badge.bad{background:var(--badbg);color:var(--bad)}.badge.warn{background:var(--warnbg);color:var(--warn)}.badge.ok{background:var(--okbg);color:var(--ok)}
+#dx{font-size:24px;line-height:1.2}
+#comp{color:var(--mute);margin:6px 0 0}
+.gauge{margin:20px 0 6px;position:relative}
+.bar{height:12px;border-radius:6px;background:linear-gradient(90deg,var(--bad) 0 23%,var(--warn) 23% 40%,var(--ok) 40% 50%,var(--warn) 50% 66%,var(--bad) 66% 100%);opacity:.85}
+.mark{position:absolute;top:-6px;width:4px;height:24px;border-radius:2px;background:var(--ink);left:50%;transform:translateX(-50%);display:none}
+.mark span{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:600;background:var(--ink);color:var(--panel);padding:1px 7px;border-radius:4px;white-space:nowrap}
+.ticks{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mute);margin-top:6px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+@media (max-width:620px){.tiles{grid-template-columns:1fr 1fr}}
+.tile{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--field)}
+.tile small{display:block;color:var(--mute);font-size:12px}
+.tile strong{font-size:16px;font-weight:600}
+.det{border-top:1px solid var(--line);padding:12px 0}
+.det h3{font-size:15px;margin-bottom:3px}
+.det p{margin:0;color:var(--mute);font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px;border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:620px){.two{grid-template-columns:1fr}}
+.two h3{font-size:15px;margin-bottom:6px}
+ul{margin:0;padding-left:18px;font-size:14px}li{margin-bottom:5px}
+.copy{margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#toast{font-size:13px;color:var(--ok)}
+footer{border-top:1px solid var(--line);padding:18px 0 28px;font-size:12.5px;color:var(--mute)}
+footer p{margin:0 0 4px}
+</style>
+</head>
+<body>
+<header><div class="wrap top">
+ <div>
+  <h1>Kalkulator AGD &amp; Klinis</h1>
+  <p>Analisis gas darah dan elektrolit terintegrasi</p>
+  <p class="credit">Supervisi medis: <b>dr. Puguh Widagdo, SpPD-FINASIM</b></p>
+ </div>
+ <button class="icon" id="themeBtn" type="button" aria-label="Ganti mode gelap atau terang">Mode gelap</button>
+</div></header>
+
+<div class="wrap"><main>
+ <section class="card" aria-labelledby="inp">
+  <h2 id="inp">Input data pasien</h2>
+  <p class="sub">Isi pH, pCO₂, dan HCO₃⁻ sebagai data minimum.</p>
+  <div class="presets" role="group" aria-label="Contoh kasus">
+   <button class="chip" type="button" data-p="dka">KAD (HAGMA)</button>
+   <button class="chip" type="button" data-p="copd">PPOK kronik</button>
+   <button class="chip" type="button" data-p="sepsis">Sepsis / laktat</button>
+   <button class="chip" type="button" data-p="hv">Hiperventilasi</button>
+   <button class="chip" type="button" data-p="vom">Muntah masif</button>
+   <button class="chip" type="button" data-p="norm">Normal</button>
+  </div>
+  <form id="f" novalidate>
+   <fieldset><legend>Asam-basa</legend><div class="grid">
+    <label>pH<input id="ph" type="number" step="0.01" inputmode="decimal"></label>
+    <label>pCO₂ (mmHg)<input id="pco2" type="number" step="0.1" inputmode="decimal"></label>
+    <label>HCO₃⁻ (mEq/L)<input id="hco3" type="number" step="0.1" inputmode="decimal"></label>
+    <label>Base excess (boleh negatif)<span class="sg"><input id="be" type="text" inputmode="decimal" autocomplete="off" placeholder="mis. -6 atau -13"><button type="button" class="icon" id="neg" aria-label="Ganti tanda plus atau minus">±</button></span></label>
+   </div></fieldset>
+   <fieldset><legend>Oksigenasi</legend><div class="grid">
+    <label>PaO₂ (mmHg)<input id="pao2" type="number" step="1" inputmode="decimal"></label>
+    <label>FiO₂ (%)<input id="fio2" type="number" step="1" inputmode="decimal"></label>
+   </div></fieldset>
+   <fieldset><legend>Elektrolit</legend><div class="grid">
+    <label>Natrium (mEq/L)<input id="na" type="number" step="1" inputmode="decimal"></label>
+    <label>Klorida (mEq/L)<input id="cl" type="number" step="1" inputmode="decimal"></label>
+   </div></fieldset>
+   <div class="actions"><button class="primary" type="submit">Hitung dan analisis</button><button class="ghost" type="button" id="rst">Reset</button></div>
+   <p id="err" role="alert" style="color:var(--bad);font-size:13px;margin:10px 0 0"></p>
+  </form>
+ </section>
+
+ <section class="card" aria-live="polite" aria-labelledby="dx">
+  <div class="res-head"><div>
+   <span class="badge" id="badge">Menunggu data</span>
+   <h2 id="dx">Masukkan nilai AGD</h2>
+   <p id="comp">Isi formulir atau pilih contoh kasus untuk melihat kompensasi, anion gap, rasio P/F, dan evaluasi klinis.</p>
+  </div></div>
+  <div class="gauge"><div class="bar"></div><div class="mark" id="mark"><span id="markv"></span></div>
+   <div class="ticks"><span>6,80</span><span>7,35</span><span>7,45</span><span>7,80</span></div></div>
+  <div class="tiles">
+   <div class="tile"><small>pH</small><strong id="t1">-</strong></div>
+   <div class="tile"><small>pCO₂ ekspektasi</small><strong id="t2">-</strong></div>
+   <div class="tile"><small>Anion gap</small><strong id="t3">-</strong></div>
+   <div class="tile"><small>Rasio P/F</small><strong id="t4">-</strong></div>
+  </div>
+  <div class="det"><h3>Evaluasi kompensasi</h3><p id="d1">Dihitung setelah data dimasukkan.</p></div>
+  <div class="det"><h3>Anion gap dan delta ratio</h3><p id="d2">Dihitung bila Na⁺ dan Cl⁻ diisi.</p></div>
+  <div class="det"><h3>Oksigenasi</h3><p id="d3">Dihitung bila PaO₂ dan FiO₂ diisi.</p></div>
+  <div class="two">
+   <div><h3>Diagnosis banding</h3><ul id="ddx"><li>Belum ada data.</li></ul></div>
+   <div><h3>Langkah klinis awal</h3><ul id="rec"><li>Belum ada data.</li></ul></div>
+  </div>
+  <div class="copy"><button class="ghost" type="button" id="soap">Salin resume SOAP</button><span id="toast" role="status"></span></div>
+ </section>
+</main></div>
+
+<footer><div class="wrap">
+ <p>Supervisi medis: dr. Puguh Widagdo, SpPD-FINASIM</p>
+ <p>Alat bantu keputusan klinis. Keputusan terapi akhir ada pada dokter penanggung jawab pasien (DPJP).</p>
+</div></footer>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var root=document.documentElement,btn=$("themeBtn");
+function setTheme(t,save){root.setAttribute("data-theme",t);btn.textContent=t==="dark"?"Mode terang":"Mode gelap";if(save){try{localStorage.setItem("agd-theme",t)}catch(e){}}}
+var st=null;try{st=localStorage.getItem("agd-theme")}catch(e){}
+setTheme(st||(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"),false);
+btn.onclick=function(){setTheme(root.getAttribute("data-theme")==="dark"?"light":"dark",true)};
+
+var P={dka:[7.15,20,7,-18,95,21,138,98],copd:[7.32,65,32,6,58,28,140,99],sepsis:[7.25,28,12,-12,85,40,136,100],hv:[7.52,24,20,-2,105,21,140,105],vom:[7.55,48,40,14,88,21,137,88],norm:[7.40,40,24,0,95,21,140,102]};
+var IDS=["ph","pco2","hco3","be","pao2","fio2","na","cl"];
+document.querySelectorAll(".chip").forEach(function(c){c.onclick=function(){P[c.dataset.p].forEach(function(v,i){$(IDS[i]).value=v});run()}});
+var last=null;
+function num(i){var s=String($(i).value).replace(/[\u2212\u2013\u2014]/g,"-").replace(",",".").trim();var v=parseFloat(s);return isNaN(v)?null:v}
+$("be").addEventListener("input",function(){var v=this.value.replace(/[\u2212\u2013\u2014]/g,"-").replace(/[^0-9.,\-]/g,"");v=v.replace(/(?!^)-/g,"");this.value=v});
+$("neg").onclick=function(){var b=$("be"),v=b.value.trim();b.value=v.charAt(0)==="-"?v.slice(1):"-"+v;b.focus()};
+function f1(x){return x.toFixed(1).replace(".",",")}
+
+function run(e){
+ if(e)e.preventDefault();
+ var ph=num("ph"),pc=num("pco2"),hc=num("hco3"),be=num("be"),pa=num("pao2"),fi=num("fio2"),na=num("na"),cl=num("cl");
+ if(ph===null||pc===null||hc===null){$("err").textContent="Lengkapi pH, pCO₂, dan HCO₃⁻ terlebih dahulu.";return}
+ $("err").textContent="";
+ var cat=ph<7.35?"Asidemia":ph>7.45?"Alkalemia":"pH normal";
+ var rA=pc>45,rK=pc<35,mA=hc<22,mK=hc>26,pri,comp="",ddx=[],rec=[],exp=null,d1="Tidak ada komponen metabolik atau respiratorik yang perlu dihitung kompensasinya.";
+ var dpc=pc-40;
+ if(cat==="Asidemia"){
+  if(rA&&!mA){pri="Asidosis respiratorik";var ea=24+0.1*dpc,ec=24+0.35*dpc;
+   if(hc>=ec-3){comp="Kompensasi metabolik sesuai pola kronik";d1="HCO₃⁻ ekspektasi akut ≈ "+f1(ea)+", kronik ≈ "+f1(ec)+" mEq/L (pasien "+hc+"). Nilai mendekati pola kronik (asidosis respiratorik kronik atau acute-on-chronic)."}
+   else if(hc>=ea-2){comp="Kompensasi minimal, pola akut";d1="HCO₃⁻ ekspektasi akut ≈ "+f1(ea)+", kronik ≈ "+f1(ec)+" mEq/L (pasien "+hc+"). Sesuai asidosis respiratorik akut."}
+   else{comp="Disertai asidosis metabolik";d1="HCO₃⁻ ekspektasi akut ≈ "+f1(ea)+" mEq/L (pasien "+hc+"). HCO₃⁻ lebih rendah dari ekspektasi, curiga asidosis metabolik penyerta."}}
+  else if(mA&&!rA){pri="Asidosis metabolik";exp=1.5*hc+8;comp=pc<35?"Terkompensasi sebagian oleh respirasi":"Tidak terkompensasi"}
+  else if(rA&&mA){pri="Asidosis campuran (respiratorik dan metabolik)";comp="Dua gangguan primer bersamaan"}
+  else{pri="Asidemia dengan pCO₂ dan HCO₃⁻ dalam rentang normal";comp="Data tidak konsisten, periksa ulang sampel"}
+ }else if(cat==="Alkalemia"){
+  if(rK&&!mK){pri="Alkalosis respiratorik";var ea2=24-0.2*(40-pc),ec2=24-0.5*(40-pc);
+   comp=hc<22?"Kompensasi metabolik sebagian":"Tidak terkompensasi";
+   d1="HCO₃⁻ ekspektasi akut ≈ "+f1(ea2)+", kronik ≈ "+f1(ec2)+" mEq/L (pasien "+hc+"). "+(hc>ea2+2?"HCO₃⁻ lebih tinggi dari ekspektasi, curiga alkalosis metabolik penyerta.":hc>=ea2-2?"Sesuai pola akut.":"Mendekati pola kronik.")}
+  else if(mK&&!rK){pri="Alkalosis metabolik";exp=0.7*hc+20;comp=pc>45?"Terkompensasi sebagian oleh respirasi":"Tidak terkompensasi"}
+  else if(rK&&mK){pri="Alkalosis campuran (respiratorik dan metabolik)";comp="Dua gangguan primer bersamaan"}
+  else{pri="Alkalemia dengan pCO₂ dan HCO₃⁻ dalam rentang normal";comp="Data tidak konsisten, periksa ulang sampel"}
+ }else{
+  if(rA&&mK){pri="Asidosis respiratorik dan alkalosis metabolik";comp="Terkompensasi penuh"}
+  else if(rK&&mA){pri="Alkalosis respiratorik dan asidosis metabolik";comp="Terkompensasi penuh"}
+  else if(rA&&mA){pri="Asidosis campuran dengan pH tertahan normal";comp="Curiga gangguan campuran, evaluasi klinis"}
+  else if(rK&&mK){pri="Alkalosis campuran dengan pH tertahan normal";comp="Curiga gangguan campuran, evaluasi klinis"}
+  else{pri="Gas darah normal";comp="Dalam batas normal"}
+ }
+ if(exp!==null){var lo=exp-2,hi=exp+2,tol=pri==="Asidosis metabolik"?2:5;lo=exp-tol;hi=exp+tol;
+  var nm=pri==="Asidosis metabolik"?"Winter: 1,5 × HCO₃⁻ + 8":"0,7 × HCO₃⁻ + 20";
+  d1="pCO₂ ekspektasi ("+nm+") = "+f1(exp)+" ± "+tol+" mmHg; pCO₂ pasien "+pc+" mmHg. ";
+  if(pc>=lo&&pc<=hi)d1+="Kompensasi respirasi sesuai.";
+  else if(pc<lo)d1+=pri==="Asidosis metabolik"?"pCO₂ lebih rendah dari ekspektasi, curiga alkalosis respiratorik penyerta.":"pCO₂ lebih rendah dari ekspektasi, curiga alkalosis respiratorik penyerta.";
+  else d1+="pCO₂ lebih tinggi dari ekspektasi, curiga asidosis respiratorik penyerta atau kelelahan napas."}
+ var ag=null,hag=false,d2="Natrium dan klorida belum diisi.";
+ if(na!==null&&cl!==null){ag=na-(cl+hc);hag=ag>12;
+  d2="AG = Na − (Cl + HCO₃) = "+na+" − ("+cl+" + "+hc+") = "+f1(ag)+" mEq/L ("+(hag?"tinggi, HAGMA":"normal")+"; rujukan 8–12, belum dikoreksi albumin). ";
+  if(hag&&hc<24){var dr=(ag-12)/(24-hc),m=dr<0.4?"NAGMA hiperkloremik":dr<1?"HAGMA dengan NAGMA bersamaan":dr<=2?"HAGMA murni":"HAGMA dengan alkalosis metabolik penyerta";d2+="Delta ratio (ΔAG/ΔHCO₃⁻) = "+dr.toFixed(2).replace(".",",")+": "+m+"."}
+  else if(hag)d2+="HCO₃⁻ ≥ 24 dengan AG tinggi, curiga alkalosis metabolik bersamaan."
+  else d2+="Delta ratio hanya dinilai pada AG tinggi."}
+ var pf=null,d3="PaO₂ dan FiO₂ belum diisi.",pfl="N/A";
+ if(pa!==null&&fi!==null&&fi>0){var fd=fi>1?fi/100:fi;pf=pa/fd;
+  var k=pf<=100?"≤ 100, rentang ARDS berat":pf<=200?"101–200, rentang ARDS sedang":pf<=300?"201–300, rentang ARDS ringan":"> 300, oksigenasi baik";
+  pfl=Math.round(pf)+"";d3="PaO₂/FiO₂ = "+pa+" / "+fd.toFixed(2).replace(".",",")+" = "+Math.round(pf)+" mmHg ("+k+"). Diagnosis ARDS (Berlin) tetap memerlukan onset akut, infiltrat bilateral, dan PEEP ≥ 5 cmH₂O."}
+ var a=pri.toLowerCase();
+ if(a.indexOf("asidosis metabolik")>-1){
+  if(hag||ag===null){ddx.push("Ketoasidosis (diabetik, alkoholik, kelaparan)","Asidosis laktat (sepsis, syok, hipoksia jaringan)","Gagal ginjal akut atau kronik (uremia)","Toksin: metanol, etilen glikol, salisilat")}
+  else ddx.push("Kehilangan bikarbonat saluran cerna (diare berat, fistula)","Asidosis tubulus renal (tipe 1, 2, 4)","Pemberian NaCl 0,9% berlebih");
+  rec.push("Cari dan koreksi penyebab (perbaiki perfusi pada sepsis; insulin dan rehidrasi pada KAD).","Cek kalium sebelum mempertimbangkan terapi bikarbonat.","Pertimbangkan hemodialisis pada uremia berat, asidosis refrakter (pH < 7,1), atau intoksikasi.")}
+ if(a.indexOf("asidosis respiratorik")>-1){
+  ddx.push("Eksaserbasi PPOK atau asma berat","Depresi pusat napas (opioid, sedatif, lesi SSP)","Penyakit neuromuskular (miastenia gravis, Guillain-Barré)","Obstruksi jalan napas atau hipoventilasi alveolar");
+  rec.push("Pastikan jalan napas dan ventilasi adekuat (NIV/BiPAP, intubasi bila GCS turun).","Beri bronkodilator dan kortikosteroid bila ada bronkospasme.","Pada PPOK, titrasi oksigen dan ulang AGD untuk menilai respons.")}
+ if(a.indexOf("alkalosis metabolik")>-1){
+  ddx.push("Kehilangan asam lambung (muntah masif, suction NGT)","Diuretik loop atau tiazid","Hipokalemia berat atau hiperaldosteronisme");
+  rec.push("Cek klorida urin untuk membedakan responsif klorida atau tidak.","Koreksi volume dengan NaCl 0,9% dan ganti kalium bila rendah.")}
+ if(a.indexOf("alkalosis respiratorik")>-1){
+  ddx.push("Ansietas atau hiperventilasi psikogenik","Emboli paru atau hipoksemia","Sepsis awal atau demam tinggi","Toksisitas salisilat dini");
+  rec.push("Cari dan atasi penyebab (nyeri, hipoksemia, sepsis, emboli paru).","Bila psikogenik, tenangkan dan arahkan pola napas; singkirkan penyebab organik lebih dulu.")}
+ if(pf!==null&&pf<=300)rec.push("Bila memenuhi kriteria ARDS: ventilasi proteksi paru (tidal volume 4–8 mL/kg BB prediksi), atur PEEP, pertimbangkan prone bila P/F < 150.");
+ if(!ddx.length)ddx.push("Parameter dalam rentang normal.");
+ if(!rec.length)rec.push("Lanjutkan pemantauan klinis dan terapi suportif sesuai kondisi pasien.");
+
+ var cls=cat==="Asidemia"?"bad":cat==="Alkalemia"?"warn":"ok";
+ $("badge").textContent=cat;$("badge").className="badge "+cls;
+ $("dx").textContent=pri;$("comp").textContent="Status kompensasi: "+comp;
+ $("t1").textContent=String(ph).replace(".",",");$("t2").textContent=exp!==null?f1(exp)+" mmHg":"N/A";
+ $("t3").textContent=ag!==null?f1(ag)+" mEq/L":"N/A";$("t4").textContent=pfl;
+ $("d1").textContent=d1;$("d2").textContent=d2;$("d3").textContent=d3;
+ fill("ddx",ddx);fill("rec",rec);
+ var pos=Math.max(0,Math.min(100,(ph-6.8)/1.0*100));
+ $("mark").style.display="block";$("mark").style.left=pos+"%";$("markv").textContent=String(ph).replace(".",",");
+ last={ph:ph,pc:pc,hc:hc,be:be,pa:pa,fi:fi,na:na,cl:cl,pri:pri,comp:comp,d1:d1,d2:d2,d3:d3,ddx:ddx,rec:rec};
+}
+function fill(id,arr){var u=$(id);u.innerHTML="";arr.forEach(function(t){var l=document.createElement("li");l.textContent=t;u.appendChild(l)})}
+$("f").addEventListener("submit",run);
+$("rst").onclick=function(){$("f").reset();$("err").textContent="";last=null;
+ $("badge").textContent="Menunggu data";$("badge").className="badge";$("dx").textContent="Masukkan nilai AGD";
+ $("comp").textContent="Isi formulir atau pilih contoh kasus untuk melihat kompensasi, anion gap, rasio P/F, dan evaluasi klinis.";
+ ["t1","t2","t3","t4"].forEach(function(i){$(i).textContent="-"});
+ $("d1").textContent="Dihitung setelah data dimasukkan.";$("d2").textContent="Dihitung bila Na⁺ dan Cl⁻ diisi.";$("d3").textContent="Dihitung bila PaO₂ dan FiO₂ diisi.";
+ fill("ddx",["Belum ada data."]);fill("rec",["Belum ada data."]);$("mark").style.display="none"};
+function toast(t){$("toast").textContent=t;setTimeout(function(){$("toast").textContent=""},3000)}
+$("soap").onclick=function(){
+ if(!last){toast("Hitung analisis terlebih dahulu.");return}
+ var r=last,v=function(x){return x===null||x===undefined?"-":x};
+ var s="RESUME ANALISIS GAS DARAH DAN ELEKTROLIT\nSupervisi medis: dr. Puguh Widagdo, SpPD-FINASIM\n\nDATA\npH "+r.ph+" | pCO2 "+r.pc+" mmHg | HCO3 "+r.hc+" mEq/L | BE "+v(r.be)+"\nPaO2 "+v(r.pa)+" mmHg | FiO2 "+v(r.fi)+"% | Na "+v(r.na)+" | Cl "+v(r.cl)+"\n\nASESMEN\n1. "+r.pri+"\n2. Kompensasi: "+r.comp+"\n3. "+r.d1+"\n4. "+r.d2+"\n5. "+r.d3+"\n\nDIAGNOSIS BANDING\n"+r.ddx.map(function(x){return"- "+x}).join("\n")+"\n\nPLAN\n"+r.rec.map(function(x){return"- "+x}).join("\n");
+ function fb(){var t=document.createElement("textarea");t.value=s;document.body.appendChild(t);t.select();try{document.execCommand("copy");toast("Resume SOAP disalin.")}catch(e){toast("Gagal menyalin.")}document.body.removeChild(t)}
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(s).then(function(){toast("Resume SOAP disalin.")},fb);else fb();
+};
+})();
+</script>
+</body>
+</html>
